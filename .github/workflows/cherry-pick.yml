@@ -29,6 +29,28 @@ jobs:
         commit-message: 'CI: bumps version to {{version}} [skip ci]'
         bump-policy: 'last-commit'
         
+    - name: Checkout main branch
+      uses: actions/checkout@v4
+      with:
+        ref: main
+
+    - name: Run command and store output
+      id: step_one
+      run: |
+        output=$(git rev-parse HEAD)
+        echo "::set-output name=output::$output"
+    - name: Use output of previous step
+      run: |
+        echo "Output of previous step: ${{ steps.step_one.outputs.output }}"
+    - name: git checkout to release
+      uses: actions/checkout@v4
+      with:
+        ref: release
+        
+    - name: cherry-pick release branch with main
+      run: |
+         git cherry-pick ${{ steps.step_one.outputs.output }}
+        
     # - name: Checkout main branch
     #   uses: actions/checkout@v4
     #   with:
